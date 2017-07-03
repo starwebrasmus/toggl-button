@@ -54,8 +54,9 @@ var GA = {
     if (Db.get("stopAtDayEnd")) {
       this.report('stop-at-day-end-time', "settings/stop-at-day-end-time" + Db.get("dayEndTime"));
     }
+    this.report('remember-project-per', "settings/remember-project-per-" + Db.get("rememberProjectPer"));
 
-    this.report('default-project', "settings/default-project" + Db.get("defaultProject"));
+    this.report('default-project', "settings/default-project" + Db.getDefaultProject());
   },
 
   generateGUID: function () {

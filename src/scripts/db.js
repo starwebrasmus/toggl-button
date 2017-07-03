@@ -22,8 +22,9 @@ var Db = {
     "pomodoroInterval": 25,
     "stopAtDayEnd": false,
     "dayEndTime": "17:00",
-    "defaultProject": "0",
-    "projects": ""
+    "defaultProject": 0,
+    "projects": "",
+    "rememberProjectPer": "false"
   },
 
   // core settings: key, default value
@@ -100,6 +101,27 @@ var Db = {
       return obj;
     }
     return null;
+  },
+
+  setDefaultProject: function (pid, service) {
+    var userId = TogglButton.$user.id,
+      defaultProjects = JSON.parse(this.get(userId + "-defaultProjects")) || {};
+    if (!service) return this.set(userId + "-defaultProject", pid);
+    defaultProjects[service] = pid;
+    this.set(userId + "-defaultProjects", JSON.stringify(defaultProjects));
+  },
+
+  getDefaultProject: function (service) {
+    var userId = TogglButton.$user.id,
+      defaultProjects = JSON.parse(this.get(userId + "-defaultProjects")),
+      defaultProject = parseInt(this.get(userId + "-defaultProject") || '0', 10);
+    if (!service || !defaultProjects)
+      return defaultProject;
+    return defaultProjects[service] || defaultProject;
+  },
+
+  resetDefaultProjects: function () {
+    this.set(TogglButton.$user.id + "-defaultProjects", null);
   },
 
   get: function (setting) {
@@ -188,6 +210,9 @@ var Db = {
         Db.updateSetting("dayEndTime", request.state);
       } else if (request.type === 'change-default-project') {
         Db.updateSetting(chrome.extension.getBackgroundPage().TogglButton.$user.id + "-defaultProject", request.state);
+      } else if (request.type === 'change-remember-project-per') {
+        Db.updateSetting("rememberProjectPer",request.state);
+        Db.resetDefaultProjects();
       } else if (request.type === 'update-dont-show-permissions' || request.type === 'update-selected-settings-tab') {
         Db.updateSetting(request.type.substr(7), request.state);
       }
